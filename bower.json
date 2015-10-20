@@ -1,0 +1,25 @@
+{
+  "name": "froala",
+  "version": "0.0.0",
+  "authors": [
+    "e"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "~4.4.0",
+    "FroalaWysiwygEditor": "2.0.0-rc.3",
+    "jquery": "~2.1.4"
+  }
+}

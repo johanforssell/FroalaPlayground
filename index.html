@@ -1,0 +1,129 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Froala test</title>
+  <!-- Include Font Awesome. -->
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
+  <!-- Include Editor style. -->
+  <link rel="stylesheet" href="bower_components/FroalaWysiwygEditor/css/froala_editor.css">
+  <link rel="stylesheet" href="bower_components/FroalaWysiwygEditor/css/froala_style.css">
+  <link rel="stylesheet" href="bower_components/FroalaWysiwygEditor/css/plugins/code_view.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Custom -->
+  <style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+  }
+  .wrapper {
+    width: 800px;
+    margin: 0 auto;
+    padding: 50px 0;
+    height: 100%;
+  }
+
+  p {
+    margin-top: 0;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    
+  <div id="froala-edit" name="content"></div>
+
+  </div>
+  
+  <!-- jQuery -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  
+  <!-- Froala -->
+  <script src="bower_components/FroalaWysiwygEditor/js/froala_editor.min.js"></script>
+  <script src="bower_components/FroalaWysiwygEditor/js/plugins/lists.min.js"></script>
+  <script src="bower_components/FroalaWysiwygEditor/js/plugins/paragraph_format.min.js"></script>
+  <script src="bower_components/FroalaWysiwygEditor/js/plugins/paragraph_style.min.js"></script>
+  <script src="bower_components/FroalaWysiwygEditor/js/plugins/code_view.min.js"></script>
+  <!-- Custom -->
+
+  <script>
+$(function() {
+  
+
+  $.FroalaEditor.DefineIcon('doit', {NAME: 'star'});
+  
+  $.FroalaEditor.RegisterCommand('doit', {
+    title: 'Do it',
+    focus: false,
+    undo: true,
+    refreshAfterCallback: false,
+    callback: function () {
+      var selection_blocks = $('#froala-edit').froalaEditor('selection.blocks');
+      console.log(selection_blocks);
+      
+      for (var block in selection_blocks) {
+        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'H1');
+      }
+      $('.selector').froalaEditor('save.save');
+
+      var selection_starts = $('#froala-edit').froalaEditor('selection.element');
+      console.log(selection_starts);
+      
+      var selection_ends = $('#froala-edit').froalaEditor('selection.endElement');
+      console.log(selection_ends);
+      
+      var selection_info = $('#froala-edit').froalaEditor('selection.info', selection_starts);
+      console.log(selection_info);
+      
+    }
+  });
+  
+  $('#froala-edit').on('froalaEditor.contentChanged', function(event, editor) {
+    console.log('CONTENT CHANGED: ' + editor.html.get());
+  });
+  
+  
+  $('#froala-edit').froalaEditor({
+    heightMin: 300,
+    tabSpaces: 4,
+    toolbarButtons: [  
+        'bold', 'italic', 'underline', 'strikeThrough', // Style 
+        'formatOL', 'formatUL', // Lists
+        'paragraphFormat', 'clearFormatting', // Paragraph style
+        '|', 'undo', 'redo', // Editor features
+        '|', 'html', 'doit', // Dev
+    ],
+    // content settings
+    fileAllowedTypes: [],
+    htmlAllowComments: false,
+    htmlAllowedAttrs: [],
+    htmlAllowedEmptyTags: [],
+    htmlAllowedTags: [
+        'b', 'strong', 'u', 'strike', 'em', // Style
+        'p', // Blocks
+        'cc-intro', 'cc-factbox', // CC Specifics
+        'br', 'ul', 'ol', 'li' // Features
+    ],
+    imageAllowedTypes: [],
+    paragraphFormat: {
+        n: 'Normal',
+        h1: 'Heading 1',
+        h2: 'Heading 2',
+        h3: 'Heading 3',
+        'cc-intro': 'Intro',
+        'cc-factbox': 'Fact box'
+    }
+  });
+  
+});
+  </script>
+</body>
+</html>

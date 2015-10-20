@@ -66,23 +66,13 @@ $(function() {
     undo: true,
     refreshAfterCallback: false,
     callback: function () {
-      var selection_blocks = $('#froala-edit').froalaEditor('selection.blocks');
-      console.log(selection_blocks);
-      
-      for (var block in selection_blocks) {
-        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'H1');
-      }
-      $('.selector').froalaEditor('save.save');
 
-      var selection_starts = $('#froala-edit').froalaEditor('selection.element');
-      console.log(selection_starts);
-      
-      var selection_ends = $('#froala-edit').froalaEditor('selection.endElement');
-      console.log(selection_ends);
-      
-      var selection_info = $('#froala-edit').froalaEditor('selection.info', selection_starts);
-      console.log(selection_info);
-      
+      var element = $('#froala-edit').froalaEditor('selection.element');
+      if (element.nodeName == 'P') {
+        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'H1');  
+      } else {
+        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'P');
+      }
     }
   });
   
@@ -92,14 +82,14 @@ $(function() {
   
   
   $('#froala-edit').froalaEditor({
-    heightMin: 300,
-    tabSpaces: 4,
+    heightMin: 200,
     toolbarButtons: [  
-        'bold', 'italic', 'underline', 'strikeThrough', // Style 
-        'formatOL', 'formatUL', // Lists
-        'paragraphFormat', 'clearFormatting', // Paragraph style
-        '|', 'undo', 'redo', // Editor features
-        '|', 'html', 'doit', // Dev
+        'doit',
+        'html'
+    ],
+    toolbarButtonsXS: [  
+        'doit',
+        'html'
     ],
     // content settings
     fileAllowedTypes: [],
@@ -108,7 +98,7 @@ $(function() {
     htmlAllowedEmptyTags: [],
     htmlAllowedTags: [
         'b', 'strong', 'u', 'strike', 'em', // Style
-        'p', // Blocks
+        'p', 'h1', // Blocks
         'cc-intro', 'cc-factbox', // CC Specifics
         'br', 'ul', 'ol', 'li' // Features
     ],

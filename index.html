@@ -47,7 +47,7 @@
   <script src="bower_components/jquery/dist/jquery.js"></script>
   
   <!-- Froala -->
-  <script src="bower_components/FroalaWysiwygEditor/js/froala_editor.min.js"></script>
+  <script src="js/froala_editor.js"></script>
   <script src="bower_components/FroalaWysiwygEditor/js/plugins/lists.min.js"></script>
   <script src="bower_components/FroalaWysiwygEditor/js/plugins/paragraph_format.min.js"></script>
   <script src="bower_components/FroalaWysiwygEditor/js/plugins/paragraph_style.min.js"></script>
@@ -80,6 +80,9 @@ $(function() {
     console.log('CONTENT CHANGED: ' + editor.html.get());
   });
   
+  $('#froala-edit').on('froalaEditor.save.after', function(event, editor, data) {
+    console.log('SAVE AFTER: ' + data);
+  });
   
   $('#froala-edit').froalaEditor({
     heightMin: 200,

@@ -1,4 +1,39 @@
-cc-intro {
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+* {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+
+.wrapper {
+	width: 800px;
+	margin: 0 auto;
+	padding: 50px 0;
+	height: 100%;
+}
+
+p {
+	margin-top: 0;
+}
+
+cc-factbox-intro {
 	background-color: lightpink;
+	font-weight: bold;
+	font-size: 2em;
 	display: block;
+	padding-left:11px;
+}
+
+cc-factbox {
+	background-color: lightpink;
+	font-weight: normal;
+	font-size: 1.5em;
+	display: block;
+	margin-bottom: 0.5em;
+	padding-left:11px;
 }

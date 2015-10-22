@@ -11,29 +11,6 @@
   <link rel="stylesheet" href="bower_components/FroalaWysiwygEditor/css/froala_style.css">
   <link rel="stylesheet" href="bower_components/FroalaWysiwygEditor/css/plugins/code_view.css">
   <link rel="stylesheet" href="style.css">
-  <!-- Custom -->
-  <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  * {
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-  }
-  .wrapper {
-    width: 800px;
-    margin: 0 auto;
-    padding: 50px 0;
-    height: 100%;
-  }
-
-  p {
-    margin-top: 0;
-  }
-  </style>
 </head>
 
 <body>
@@ -57,11 +34,14 @@
   <script>
 $(function() {
   
-
-  $.FroalaEditor.DefineIcon('doit', {NAME: 'star'});
+  // Add our own tags
+  $.FroalaEditor.BLOCK_TAGS.push("cc-factbox-intro", "cc-factbox");
   
-  $.FroalaEditor.RegisterCommand('doit', {
-    title: 'Do it',
+  $.FroalaEditor.DefineIcon('cc-factbox-intro', {NAME: 'header'});
+  $.FroalaEditor.DefineIcon('cc-factbox', {NAME: 'list-alt'});
+  
+  $.FroalaEditor.RegisterCommand('cc-factbox-intro', {
+    title: 'Fact box intro',
     focus: false,
     undo: true,
     refreshAfterCallback: false,
@@ -69,29 +49,46 @@ $(function() {
 
       var element = $('#froala-edit').froalaEditor('selection.element');
       if (element.nodeName == 'P') {
-        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'cc-intro');  
+        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'cc-factbox-intro');  
       } else {
         $('#froala-edit').froalaEditor('paragraphFormat.apply', 'P');
       }
     }
   });
   
+  $.FroalaEditor.RegisterCommand('cc-factbox', {
+    title: 'Fact box body',
+    focus: false,
+    undo: true,
+    refreshAfterCallback: false,
+    callback: function () {
+
+      var element = $('#froala-edit').froalaEditor('selection.element');
+      if (element.nodeName == 'P') {
+        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'cc-factbox');  
+      } else {
+        $('#froala-edit').froalaEditor('paragraphFormat.apply', 'P');
+      }
+    }
+  });
+  
+  
+  
   $('#froala-edit').on('froalaEditor.contentChanged', function(event, editor) {
     console.log('CONTENT CHANGED: ' + editor.html.get());
   });
   
-  $('#froala-edit').on('froalaEditor.save.after', function(event, editor, data) {
-    console.log('SAVE AFTER: ' + data);
-  });
   
   $('#froala-edit').froalaEditor({
     heightMin: 200,
     toolbarButtons: [  
-        'doit',
+        'cc-factbox-intro',
+        'cc-factbox',
         'html'
     ],
     toolbarButtonsXS: [  
-        'doit',
+        'cc-factbox-intro',
+        'cc-factbox',
         'html'
     ],
     // content settings
@@ -102,12 +99,14 @@ $(function() {
     htmlAllowedTags: [
         'b', 'strong', 'u', 'strike', 'em', // Style
         'p', 'h1', // Blocks
-        'cc-intro', 'cc-factbox', // CC Specifics
+        'cc-factbox-intro', 'cc-factbox', // CC Specifics
         'br', 'ul', 'ol', 'li' // Features
     ],
     imageAllowedTypes: []
   });
   
+    console.log($('#froala-edit').BLOCK_TAGS);
+    
 });
   </script>
 </body>

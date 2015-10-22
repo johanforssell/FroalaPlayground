@@ -1783,51 +1783,59 @@ function(jq) {
 
 function(jq) {
 	"use strict";
-	jq.FroalaEditor.UNICODE_NBSP = String.fromCharCode(160), jq.FroalaEditor.VOID_ELEMENTS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"], jq.FroalaEditor.BLOCK_TAGS = ["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "blockquote", "ul", "ol", "li", "table", "td", "th", "thead", "tfoot", "tbody", "tr", "hr"], jq.extend(jq.FroalaEditor.DEFAULTS, {
+	jq.FroalaEditor.UNICODE_NBSP = String.fromCharCode(160), 
+	jq.FroalaEditor.VOID_ELEMENTS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"],
+	
+	// BLOCK ELEMENTS DEFINED HERE 
+	jq.FroalaEditor.BLOCK_TAGS = ["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "blockquote", "ul", "ol", "li", "table", "td", "th", "thead", "tfoot", "tbody", "tr", "hr"], 
+	
+	jq.extend(jq.FroalaEditor.DEFAULTS, {
 		htmlAllowedEmptyTags: ["textarea", "a", "iframe", "object", "video", "style", "script"],
 		htmlSimpleAmpersand: !1
-	}), jq.FroalaEditor.MODULES.html = function(b) {
-		function c() {
-			return b.opts.enter == jq.FroalaEditor.ENTER_P ? "p" : b.opts.enter == jq.FroalaEditor.ENTER_DIV ? "div" : b.opts.enter == jq.FroalaEditor.ENTER_BR ? null : void 0
+	}), 
+	
+	jq.FroalaEditor.MODULES.html = function(editor) {
+		function htmlDefaultTag() {
+			return editor.opts.enter == jq.FroalaEditor.ENTER_P ? "p" : editor.opts.enter == jq.FroalaEditor.ENTER_DIV ? "div" : editor.opts.enter == jq.FroalaEditor.ENTER_BR ? null : void 0
 		}
-		function d(c) {
+		function htmlEmptyBlocks(c) {
 			"undefined" == typeof c && (c = !1);
 			var d, g, h = [];
-			if (c) for (d = b.$el.find(f()), g = 0; g < d.length; g++) {
-				for (var i = b.node.contents(d[g]), j = !1, k = 0; k < i.length; k++) if (i[k].nodeType != Node.COMMENT_NODE && (i[k].nodeType == Node.ELEMENT_NODE && jq.FroalaEditor.VOID_ELEMENTS.indexOf(i[k].tagName.toLowerCase()) >= 0 || i[k].textContent && i[k].textContent.replace(/\u200B/g, "").length > 0)) {
+			if (c) for (d = editor.$el.find(htmlBlockTagsQuery()), g = 0; g < d.length; g++) {
+				for (var i = editor.node.contents(d[g]), j = !1, k = 0; k < i.length; k++) if (i[k].nodeType != Node.COMMENT_NODE && (i[k].nodeType == Node.ELEMENT_NODE && jq.FroalaEditor.VOID_ELEMENTS.indexOf(i[k].tagName.toLowerCase()) >= 0 || i[k].textContent && i[k].textContent.replace(/\u200B/g, "").length > 0)) {
 					j = !0;
 					break
 				}
-				j || 0 !== jq(d[g]).find(f()).length || h.push(d[g])
+				j || 0 !== jq(d[g]).find(htmlBlockTagsQuery()).length || h.push(d[g])
 			} else
-			for (d = b.$el.find(e()), g = 0; g < d.length; g++) 0 === jq(d[g]).find(f()).length && h.push(d[g]);
+			for (d = editor.$el.find(htmlEmptyBlockTagsQuery()), g = 0; g < d.length; g++) 0 === jq(d[g]).find(htmlBlockTagsQuery()).length && h.push(d[g]);
 			return jq(jq.makeArray(h))
 		}
-		function e() {
+		function htmlEmptyBlockTagsQuery() {
 			return jq.FroalaEditor.BLOCK_TAGS.join(":empty, ") + ":empty"
 		}
-		function f() {
+		function htmlBlockTagsQuery() {
 			return jq.FroalaEditor.BLOCK_TAGS.join(", ")
 		}
-		function g() {
+		function htmlCleanEmptyTags() {
 			var c = jq.merge(["TD", "TH"], jq.FroalaEditor.VOID_ELEMENTS);
-			c = jq.merge(c, b.opts.htmlAllowedEmptyTags);
+			c = jq.merge(c, editor.opts.htmlAllowedEmptyTags);
 			var d;
-			do d = b.$el.find("*:empty").not(c.join(", ") + ", .fr-marker"), d.remove(), d = b.$el.find("*:empty").not(c.join(", ") + ", .fr-marker");
+			do d = editor.$el.find("*:empty").not(c.join(", ") + ", .fr-marker"), d.remove(), d = editor.$el.find("*:empty").not(c.join(", ") + ", .fr-marker");
 			while (d.length)
 		}
 		function h(d, e) {
-			var f = c();
+			var f = htmlDefaultTag();
 			
-			if (e && (f = 'div class="fr-temp-div"'), f) for (var g = b.node.contents(d.get(0)), h = null, i = 0; i < g.length; i++) {
+			if (e && (f = 'div class="fr-temp-div"'), f) for (var g = editor.node.contents(d.get(0)), h = null, i = 0; i < g.length; i++) {
 				var j = g[i];
-				if (j.nodeType == Node.ELEMENT_NODE && b.node.isBlock(j)) h = null;
+				if (j.nodeType == Node.ELEMENT_NODE && editor.node.isBlock(j)) h = null;
 				else if (j.nodeType != Node.ELEMENT_NODE && j.nodeType != Node.TEXT_NODE) h = null;
 				else if (j.nodeType == Node.ELEMENT_NODE && "BR" == j.tagName) if (null == h) e ? jq(j).replaceWith("<" + f + ' data-empty="true"><br/></div>') : jq(j).replaceWith(jq("<" + f + ">"));
 				else {
 					jq(j).remove();
 					
-					for (var k = b.node.contents(h), l = !1, m = 0; m < k.length; m++) if (!jq(k[m]).hasClass("fr-marker")) {
+					for (var k = editor.node.contents(h), l = !1, m = 0; m < k.length; m++) if (!jq(k[m]).hasClass("fr-marker")) {
 						l = !0;
 						break
 					}
@@ -1835,44 +1843,44 @@ function(jq) {
 				} else null == h && (h = jq("<" + f + ">"), jq(j).before(h)), j.nodeType == Node.TEXT_NODE && jq(j).text().trim().length > 0 ? (h.append(jq(j).clone()), jq(j).remove()) : h.append(jq(j))
 			}
 		}
-		function i(c, d, e) {
-			return b.$wp ? ("undefined" == typeof c && (c = !1), "undefined" == typeof d && (d = !1), "undefined" == typeof e && (e = !1), h(b.$el, c), b.$el.find(".fr-inner").each(function() {
+		function htmlWrap(c, d, e) {
+			return editor.$wp ? ("undefined" == typeof c && (c = !1), "undefined" == typeof d && (d = !1), "undefined" == typeof e && (e = !1), h(editor.$el, c), editor.$el.find(".fr-inner").each(function() {
 				h(jq(this), c)
-			}), d && b.$el.find("td, th").each(function() {
+			}), d && editor.$el.find("td, th").each(function() {
 				h(jq(this), c)
-			}), void(e && b.$el.find("blockquote").each(function() {
+			}), void(e && editor.$el.find("blockquote").each(function() {
 				h(jq(this), c)
 			}))) : !1
 		}
-		function j() {
-			b.$el.find("div.fr-temp-div").each(function() {
+		function htmlUnwrap() {
+			editor.$el.find("div.fr-temp-div").each(function() {
 				jq(this).data("empty") || "LI" == this.parentNode.tagName ? jq(this).replaceWith(jq(this).html()) : jq(this).replaceWith(jq(this).html() + "<br>")
 			})
 		}
-		function k(a) {
-			d(a).not("hr").append("<br/>")
+		function htmlFillEmptyBlocks(a) {
+			htmlEmptyBlocks(a).not("hr").append("<br/>")
 		}
-		function l() {
-			return b.$el.find(f())
+		function htmlBlocks() {
+			return editor.$el.find(htmlBlockTagsQuery())
 		}
 		function m(a) {
-			"undefined" == typeof a && (a = b.$el.get(0));
-			for (var c = b.node.contents(a), d = c.length - 1; d >= 0; d--) if (c[d].nodeType == Node.TEXT_NODE && b.node.isBlock(a)) {
+			"undefined" == typeof a && (a = editor.$el.get(0));
+			for (var c = editor.node.contents(a), d = c.length - 1; d >= 0; d--) if (c[d].nodeType == Node.TEXT_NODE && editor.node.isBlock(a)) {
 				for (var e = -1; e != c[d].textContent.length;) e = c[d].textContent.length, c[d].textContent = c[d].textContent.replace(/(?!^)  (?!$)/g, " ");
-				c[d].textContent = c[d].textContent.replace(/^  /g, " "), c[d].textContent = c[d].textContent.replace(/  $/g, " "), b.node.isBlock(a) && (c[d].previousSibling || (c[d].textContent = c[d].textContent.replace(/^ */, "")), c[d].nextSibling || (c[d].textContent = c[d].textContent.replace(/ *$/, "")))
+				c[d].textContent = c[d].textContent.replace(/^  /g, " "), c[d].textContent = c[d].textContent.replace(/  $/g, " "), editor.node.isBlock(a) && (c[d].previousSibling || (c[d].textContent = c[d].textContent.replace(/^ */, "")), c[d].nextSibling || (c[d].textContent = c[d].textContent.replace(/ *$/, "")))
 			} else m(c[d])
 		}
-		function n(c) {
-			if ("undefined" == typeof c && (c = b.$el.get(0)), c.nodeType == Node.ELEMENT_NODE) for (var d = b.node.contents(c), e = d.length - 1; e >= 0; e--) jq(d[e]).hasClass("fr-marker") || n(d[e]);
+		function htmlNormalizeSpaces(c) {
+			if ("undefined" == typeof c && (c = editor.$el.get(0)), c.nodeType == Node.ELEMENT_NODE) for (var d = editor.node.contents(c), e = d.length - 1; e >= 0; e--) jq(d[e]).hasClass("fr-marker") || htmlNormalizeSpaces(d[e]);
 			else if (c.nodeType == Node.TEXT_NODE && c.textContent.length > 0) {
 				var f = c.previousSibling,
 					g = c.nextSibling;
-				if (b.node.isBlock(f) && b.node.isBlock(g) && 0 === c.textContent.trim().length) jq(c).remove();
+				if (editor.node.isBlock(f) && editor.node.isBlock(g) && 0 === c.textContent.trim().length) jq(c).remove();
 				else {
 					var h = c.textContent;
 					h = h.replace(new RegExp(jq.FroalaEditor.UNICODE_NBSP, "g"), " ");
 					for (var i = "", j = 0; j < h.length; j++) i += 32 != h.charCodeAt(j) || 0 !== j && 32 != i.charCodeAt(j - 1) ? h[j] : jq.FroalaEditor.UNICODE_NBSP;
-					c.nextSibling || (i = i.replace(/ $/, jq.FroalaEditor.UNICODE_NBSP)), c.previousSibling && !b.node.isVoid(c.previousSibling) && (i = i.replace(/^\u00A0([^ $])/, " $1")), i = i.replace(/([^ \u00A0])\u00A0([^ \u00A0])/g, "$1 $2"), c.textContent != i && (c.textContent = i)
+					c.nextSibling || (i = i.replace(/ $/, jq.FroalaEditor.UNICODE_NBSP)), c.previousSibling && !editor.node.isVoid(c.previousSibling) && (i = i.replace(/^\u00A0([^ $])/, " $1")), i = i.replace(/([^ \u00A0])\u00A0([^ \u00A0])/g, "$1 $2"), c.textContent != i && (c.textContent = i)
 				}
 			}
 		}
@@ -1883,103 +1891,110 @@ function(jq) {
 		}
 		function p(c) {
 			var d = jq("<div " + c + ">");
-			return b.node.rawAttributes(d.get(0))
+			return editor.node.rawAttributes(d.get(0))
 		}
 		function q(a, b) {
 			var c = a.match(/<!DOCTYPE ?([^ ]*) ?([^ ]*) ?"?([^"]*)"? ?"?([^"]*)"?>/i);
 			return c ? b.implementation.createDocumentType(c[1], c[3], c[4]) : b.implementation.createDocumentType("html")
 		}
-		function r(a) {
+		function htmlGetDoctype(a) {
 			var b = a.doctype,
 				c = "<!DOCTYPE html>";
 			return b && (c = "<!DOCTYPE " + b.name + (b.publicId ? ' PUBLIC "' + b.publicId + '"' : "") + (!b.publicId && b.systemId ? " SYSTEM" : "") + (b.systemId ? ' "' + b.systemId + '"' : "") + ">"), c
 		}
 		function s() {
-			i(), m(), g(), n(), k(!0), b.clean.quotes(), b.clean.lists(), b.clean.tables(), b.clean.toHTML5(), b.clean.quotes(), b.placeholder.refresh(), b.selection.restore(), t()
+			htmlWrap(), m(), htmlCleanEmptyTags(), htmlNormalizeSpaces(), htmlFillEmptyBlocks(!0), editor.clean.quotes(), editor.clean.lists(), editor.clean.tables(), editor.clean.toHTML5(), editor.clean.quotes(), editor.placeholder.refresh(), editor.selection.restore(), htmlCheckIfEmpty()
 		}
-		function t() {
-			null != c() && b.core.isEmpty() && 0 === b.$el.find(f()).length && (b.core.hasFocus() ? (b.$el.html("<" + c() + ">" + jq.FroalaEditor.MARKERS + "<br/></" + c() + ">"), b.selection.restore()) : b.$el.html("<" + c() + "><br/></" + c() + ">"))
+		function htmlCheckIfEmpty() {
+			null != htmlDefaultTag() && editor.core.isEmpty() && 0 === editor.$el.find(htmlBlockTagsQuery()).length && (editor.core.hasFocus() ? (editor.$el.html("<" + htmlDefaultTag() + ">" + jq.FroalaEditor.MARKERS + "<br/></" + htmlDefaultTag() + ">"), editor.selection.restore()) : editor.$el.html("<" + htmlDefaultTag() + "><br/></" + htmlDefaultTag() + ">"))
 		}
-		function u(a) {
-			var c = b.clean.html(a, [], [], b.opts.fullPage);
-			if (c = c.replace(/\r|\n/g, ""), b.opts.fullPage) {
+		
+		function htmlSet(new_html) {
+			var c = editor.clean.html(new_html, [], [], editor.opts.fullPage);
+			if (c = c.replace(/\r|\n/g, ""), editor.opts.fullPage) {
 				var d = (o(c, "<body[^>]*?>([\\w\\W]*)</body>", 1) || c).replace(/\r|\n/g, ""),
 					e = p(o(c, "<body([^>]*?)>", 1) || ""),
 					f = o(c, "<head[^>]*?>([\\w\\W]*)</head>", 1) || "<head><title></title></head>",
 					g = p(o(c, "<head([^>]*?)>", 1) || ""),
 					h = o(c, "<!DOCTYPE([^>]*?)>", 0) || "<!DOCTYPE html>",
 					i = p(o(c, "<html([^>]*?)>", 1) || "");
-				b.$el.html(d), b.node.clearAttributes(b.$el.get(0)), b.$el.attr(e), b.$head.html(f), b.node.clearAttributes(b.$head.get(0)), b.$head.attr(g), b.node.clearAttributes(b.$html.get(0)), b.$html.attr(i), b.iframe_document.doctype.parentNode.replaceChild(q(h, b.iframe_document), b.iframe_document.doctype)
-			} else b.$el.html(c);
-			b.edit.on(), b.core.injectStyle(b.opts.iframeStyle), s(), b.events.trigger("html.set")
+				editor.$el.html(d), editor.node.clearAttributes(editor.$el.get(0)), editor.$el.attr(e), editor.$head.html(f), editor.node.clearAttributes(editor.$head.get(0)), editor.$head.attr(g), editor.node.clearAttributes(editor.$html.get(0)), editor.$html.attr(i), editor.iframe_document.doctype.parentNode.replaceChild(q(h, editor.iframe_document), editor.iframe_document.doctype)
+			} else {
+				editor.$el.html(c);
+			}
+			editor.edit.on(), 
+			editor.core.injectStyle(editor.opts.iframeStyle), 
+			s(), 
+			editor.events.trigger("html.set")
 		}
-		function v(a) {
+		
+		function htmlGet(a) {
 			var c = "";
-			b.events.trigger("html.beforeGet"), b.core.isEmpty() || ("undefined" == typeof a && (a = !1), b.opts.fullPage ? (c = r(b.iframe_document), c += "<html" + b.node.attributes(b.$html.get(0)) + ">" + b.$html.html() + "</html>") : c = b.$el.html()), c = c.replace(/<pre(?:[\w\W]*?)>(?:[\w\W]*?)<\/pre>/g, function(a) {
+			editor.events.trigger("html.beforeGet"), editor.core.isEmpty() || ("undefined" == typeof a && (a = !1), editor.opts.fullPage ? (c = htmlGetDoctype(editor.iframe_document), c += "<html" + editor.node.attributes(editor.$html.get(0)) + ">" + editor.$html.html() + "</html>") : c = editor.$el.html()), c = c.replace(/<pre(?:[\w\W]*?)>(?:[\w\W]*?)<\/pre>/g, function(a) {
 				return a.replace(/<br>/g, "\n")
-			}), b.opts.fullPage && (c = c.replace(/<style data-fr-style="true">(?:[\w\W]*?)<\/style>/g, ""), c = c.replace(/<style(?:[\w\W]*?)class="firebugResetStyles"(?:[\w\W]*?)>(?:[\w\W]*?)<\/style>/g, ""), c = c.replace(/<body((?:[\w\W]*?)) spellcheck="true"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$2>$3</body>"), c = c.replace(/<body((?:[\w\W]*?)) contenteditable="(true|false)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$3>$4</body>"), c = c.replace(/<body((?:[\w\W]*?)) dir="([\w]*)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$3>$4</body>"), c = c.replace(/<body((?:[\w\W]*?))class="([\w\W]*?)(fr-rtl|fr-ltr)([\w\W]*?)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, '<body$1class="$2$4"$5>$6</body>'), c = c.replace(/<body((?:[\w\W]*?)) class=""((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$2>$3</body>")), b.opts.htmlSimpleAmpersand && (c = c.replace(/\&amp;/gi, "&")), b.events.trigger("html.afterGet"), a || (c = c.replace(/<span[^>]*? class\s*=\s*["']?fr-marker["']?[^>]+>\u200b<\/span>/gi, "")), c = b.clean.invisibleSpaces(c);
-			var d = b.events.chainTrigger("html.get", c);
+			}), editor.opts.fullPage && (c = c.replace(/<style data-fr-style="true">(?:[\w\W]*?)<\/style>/g, ""), c = c.replace(/<style(?:[\w\W]*?)class="firebugResetStyles"(?:[\w\W]*?)>(?:[\w\W]*?)<\/style>/g, ""), c = c.replace(/<body((?:[\w\W]*?)) spellcheck="true"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$2>$3</body>"), c = c.replace(/<body((?:[\w\W]*?)) contenteditable="(true|false)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$3>$4</body>"), c = c.replace(/<body((?:[\w\W]*?)) dir="([\w]*)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$3>$4</body>"), c = c.replace(/<body((?:[\w\W]*?))class="([\w\W]*?)(fr-rtl|fr-ltr)([\w\W]*?)"((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, '<body$1class="$2$4"$5>$6</body>'), c = c.replace(/<body((?:[\w\W]*?)) class=""((?:[\w\W]*?))>((?:[\w\W]*?))<\/body>/g, "<body$1$2>$3</body>")), editor.opts.htmlSimpleAmpersand && (c = c.replace(/\&amp;/gi, "&")), editor.events.trigger("html.afterGet"), a || (c = c.replace(/<span[^>]*? class\s*=\s*["']?fr-marker["']?[^>]+>\u200b<\/span>/gi, "")), c = editor.clean.invisibleSpaces(c);
+			var d = editor.events.chainTrigger("html.get", c);
 			return "string" == typeof d && (c = d), c
 		}
-		function w() {
+		function htmlGetSelected() {
 			var c = function(c, d) {
-				for (; d && (d.nodeType == Node.TEXT_NODE || !b.node.isBlock(d));) d && d.nodeType != Node.TEXT_NODE && jq(c).wrapInner(b.node.openTagString(d) + b.node.closeTagString(d)), d = d.parentNode;
+				for (; d && (d.nodeType == Node.TEXT_NODE || !editor.node.isBlock(d));) d && d.nodeType != Node.TEXT_NODE && jq(c).wrapInner(editor.node.openTagString(d) + editor.node.closeTagString(d)), d = d.parentNode;
 				d && c.innerHTML == d.innerHTML && (c.innerHTML = d.outerHTML)
 			},
 				d = function() {
 					var c, d = null;
-					return b.window.getSelection ? (c = b.window.getSelection(), c && c.rangeCount && (d = c.getRangeAt(0).commonAncestorContainer, d.nodeType != Node.ELEMENT_NODE && (d = d.parentNode))) : (c = b.document.selection) && "Control" != c.type && (d = c.createRange().parentElement()), null != d && (jq.inArray(b.$el.get(0), jq(d).parents()) >= 0 || d == b.$el.get(0)) ? d : null
+					return editor.window.getSelection ? (c = editor.window.getSelection(), c && c.rangeCount && (d = c.getRangeAt(0).commonAncestorContainer, d.nodeType != Node.ELEMENT_NODE && (d = d.parentNode))) : (c = editor.document.selection) && "Control" != c.type && (d = c.createRange().parentElement()), null != d && (jq.inArray(editor.$el.get(0), jq(d).parents()) >= 0 || d == editor.$el.get(0)) ? d : null
 				},
 				e = "";
-			if ("undefined" != typeof b.window.getSelection) {
-				b.browser.mozilla && (b.selection.save(), b.$el.find('.fr-marker[data-type="false"]').length > 1 && (b.$el.find('.fr-marker[data-type="false"][data-id="0"]').remove(), b.$el.find('.fr-marker[data-type="false"]:last').attr("data-id", "0"), b.$el.find(".fr-marker").not('[data-id="0"]').remove()), b.selection.restore());
-				for (var f = b.selection.ranges(), g = 0; g < f.length; g++) {
+			if ("undefined" != typeof editor.window.getSelection) {
+				editor.browser.mozilla && (editor.selection.save(), editor.$el.find('.fr-marker[data-type="false"]').length > 1 && (editor.$el.find('.fr-marker[data-type="false"][data-id="0"]').remove(), editor.$el.find('.fr-marker[data-type="false"]:last').attr("data-id", "0"), editor.$el.find(".fr-marker").not('[data-id="0"]').remove()), editor.selection.restore());
+				for (var f = editor.selection.ranges(), g = 0; g < f.length; g++) {
 					var h = document.createElement("div");
 					h.appendChild(f[g].cloneContents()), c(h, d()), e += h.innerHTML
 				}
-			} else "undefined" != typeof b.document.selection && "Text" == b.document.selection.type && (e = b.document.selection.createRange().htmlText);
+			} else "undefined" != typeof editor.document.selection && "Text" == editor.document.selection.type && (e = editor.document.selection.createRange().htmlText);
 			return e
 		}
 		function x(b) {
 			var c = jq("<div>").html(b);
-			return c.find(f()).length > 0
+			return c.find(htmlBlockTagsQuery()).length > 0
 		}
 		function y(c) {
 			var d = jq("<div>").html(c);
-			return b.selection.setAtEnd(d.get(0)), d.html()
+			return editor.selection.setAtEnd(d.get(0)), d.html()
 		}
-		function z(a) {
+		function htmlEscapeEntities(a) {
 			return a.replace(/</gi, "&lt;").replace(/>/gi, "&gt;").replace(/"/gi, "&quot;").replace(/'/gi, "&apos;")
 		}
-		function A(c, d) {
-			"" !== b.selection.text() && b.selection.remove();
+		function htmlInsert(c, d) {
+			"" !== editor.selection.text() && editor.selection.remove();
 			
 			var e;
-			if (e = d ? c : b.clean.html(c), c.indexOf('class="fr-marker"') < 0 && (e = y(e)), b.core.isEmpty()) b.$el.html(e);
+			if (e = d ? c : editor.clean.html(c), c.indexOf('class="fr-marker"') < 0 && (e = y(e)), editor.core.isEmpty()) editor.$el.html(e);
 			else {
-				b.markers.insert();
+				editor.markers.insert();
 				
-				var f, g = b.$el.find(".fr-marker").get(0);
-				if (x(e) && (f = b.node.deepestParent(g))) if (b.node.isBlock(f) && b.node.isEmpty(f)) jq(f).replaceWith(e);
+				var f, g = editor.$el.find(".fr-marker").get(0);
+				if (x(e) && (f = editor.node.deepestParent(g))) if (editor.node.isBlock(f) && editor.node.isEmpty(f)) jq(f).replaceWith(e);
 				else {
 					var h = g,
 						i = "",
 						j = "";
-					do h = h.parentNode, i += b.node.closeTagString(h), j = b.node.openTagString(h) + j;
+					do h = h.parentNode, i += editor.node.closeTagString(h), j = editor.node.openTagString(h) + j;
 					while (h != f);
 					jq(g).replaceWith('<span id="fr-break"></span>');
-					var k = b.node.openTagString(f) + jq(f).html() + b.node.closeTagString(f);
+					var k = editor.node.openTagString(f) + jq(f).html() + editor.node.closeTagString(f);
 					k = k.replace(/<span id="fr-break"><\/span>/g, i + e + j), jq(f).replaceWith(k)
 				} else jq(g).replaceWith(e)
 			}
 			s()
 		}
-		function B(c) {
+		function htmlCleanWhiteTags(c) {
 			var d = null;
-			"undefined" == typeof c && (d = b.selection.element());
+			"undefined" == typeof c && (d = editor.selection.element());
 			var e, f;
 			do {
-				f = !1, e = b.$el.find("*").not(d).not(".fr-marker");
+				f = !1, e = editor.$el.find("*").not(d).not(".fr-marker");
 				for (var g = 0; g < e.length; g++) {
 					var h = e.get(g),
 						i = h.textContent;
@@ -1988,34 +2003,34 @@ function(jq) {
 			} while 
 			(f)
 		}
-		function C() {
+		function init() {
 			var a = function() {
-				B(), b.placeholder && b.placeholder.refresh()
+				htmlCleanWhiteTags(), editor.placeholder && editor.placeholder.refresh()
 			};
 			
-			b.events.on("mouseup", a), b.events.on("keydown", a), b.events.on("contentChanged", t)
+			editor.events.on("mouseup", a), editor.events.on("keydown", a), editor.events.on("contentChanged", htmlCheckIfEmpty)
 		}
 		return {
 			require: ["selection", "clean"],
-			defaultTag: c,
-			emptyBlocks: d,
-			emptyBlockTagsQuery: e,
-			blockTagsQuery: f,
-			fillEmptyBlocks: k,
-			cleanEmptyTags: g,
-			cleanWhiteTags: B,
-			normalizeSpaces: n,
-			blocks: l,
-			getDoctype: r,
-			set: u,
-			get: v,
-			getSelected: w,
-			insert: A,
-			wrap: i,
-			unwrap: j,
-			escapeEntities: z,
-			checkIfEmpty: t,
-			_init: C
+			defaultTag: htmlDefaultTag,
+			emptyBlocks: htmlEmptyBlocks,
+			emptyBlockTagsQuery: htmlEmptyBlockTagsQuery,
+			blockTagsQuery: htmlBlockTagsQuery,
+			fillEmptyBlocks: htmlFillEmptyBlocks,
+			cleanEmptyTags: htmlCleanEmptyTags,
+			cleanWhiteTags: htmlCleanWhiteTags,
+			normalizeSpaces: htmlNormalizeSpaces,
+			blocks: htmlBlocks,
+			getDoctype: htmlGetDoctype,
+			set: htmlSet,
+			get: htmlGet,
+			getSelected: htmlGetSelected,
+			insert: htmlInsert,
+			wrap: htmlWrap,
+			unwrap: htmlUnwrap,
+			escapeEntities: htmlEscapeEntities,
+			checkIfEmpty: htmlCheckIfEmpty,
+			_init: init
 		}
 	}
 }(jQuery), 
@@ -2099,11 +2114,13 @@ function(jq) {
 		OPEN_SQUARE_BRACKET: 219,
 		BACKSLASH: 220,
 		CLOSE_SQUARE_BRACKET: 221
-	}, jq.extend(jq.FroalaEditor.DEFAULTS, {
+	}, 
+	jq.extend(jq.FroalaEditor.DEFAULTS, {
 		enter: jq.FroalaEditor.ENTER_P,
 		multiLine: !0,
 		tabSpaces: 0
-	}), jq.FroalaEditor.MODULES.keys = function(b) {
+	}), 
+	jq.FroalaEditor.MODULES.keys = function(b) {
 		function c(a) {
 			a.preventDefault(), a.stopPropagation(), b.opts.multiLine && ("" !== b.selection.text() && b.selection.remove(), b.cursor.enter())
 		}
@@ -2152,7 +2169,7 @@ function(jq) {
 			b.events.disableBlur();
 			
 			var i = h.which,
-				k = p(i) && !o(h),
+				k = isCharacter(i) && !ctrlKey(h),
 				l = i == jq.FroalaEditor.KEYCODE.BACKSPACE || i == jq.FroalaEditor.KEYCODE.DELETE;
 			if (b.selection.isFull() && !b.opts.keepFormatOnDelete || l && b.placeholder.isVisible() && b.opts.keepFormatOnDelete) {
 				if (k || l) {
@@ -2162,7 +2179,7 @@ function(jq) {
 				}
 				b.selection.restore()
 			}
-			i == jq.FroalaEditor.KEYCODE.ENTER ? h.shiftKey ? d(h) : c(h) : i != jq.FroalaEditor.KEYCODE.BACKSPACE || o(h) ? i != jq.FroalaEditor.KEYCODE.DELETE || o(h) ? i == jq.FroalaEditor.KEYCODE.SPACE ? g(h) : i == jq.FroalaEditor.KEYCODE.TAB ? j(h) : o(h) || !p(h.which) || b.selection.isCollapsed() || b.selection.remove() : f(h) : e(h), b.events.enableBlur()
+			i == jq.FroalaEditor.KEYCODE.ENTER ? h.shiftKey ? d(h) : c(h) : i != jq.FroalaEditor.KEYCODE.BACKSPACE || ctrlKey(h) ? i != jq.FroalaEditor.KEYCODE.DELETE || ctrlKey(h) ? i == jq.FroalaEditor.KEYCODE.SPACE ? g(h) : i == jq.FroalaEditor.KEYCODE.TAB ? j(h) : ctrlKey(h) || !isCharacter(h.which) || b.selection.isCollapsed() || b.selection.remove() : f(h) : e(h), b.events.enableBlur()
 		}
 		function l(c) {
 			for (var d = 0; d < c.length; d++) c[d].nodeType == Node.TEXT_NODE && /\u200B/gi.test(c[d].textContent) ? (c[d].textContent = c[d].textContent.replace(/\u200B/gi, ""), 0 === c[d].textContent.length && jq(c[d]).remove()) : c[d].nodeType == Node.ELEMENT_NODE && "IFRAME" != c[d].nodeType && l(b.node.contents(c[d]))
@@ -2191,13 +2208,13 @@ function(jq) {
 			
 			i(j) && 0 === jq(j).find("li").length && !jq(j).hasClass("fr-marker") && "IFRAME" != j.tagName && (b.selection.save(), l(b.node.contents(j)), b.selection.restore())
 		}
-		function o(a) {
+		function ctrlKey(a) {
 			if (-1 != navigator.userAgent.indexOf("Mac OS X")) {
 				if (a.metaKey && !a.altKey) return !0
 			} else if (a.ctrlKey && !a.altKey) return !0;
 			return !1
 		}
-		function p(c) {
+		function isCharacter(c) {
 			if (c >= jq.FroalaEditor.KEYCODE.ZERO && c <= jq.FroalaEditor.KEYCODE.NINE) return !0;
 			if (c >= jq.FroalaEditor.KEYCODE.NUM_ZERO && c <= jq.FroalaEditor.KEYCODE.NUM_MULTIPLY) return !0;
 			if (c >= jq.FroalaEditor.KEYCODE.A && c <= jq.FroalaEditor.KEYCODE.Z) return !0;
@@ -2229,17 +2246,17 @@ function(jq) {
 		}
 		function q(a) {
 			var c = a.which;
-			return o(a) || c >= 37 && 40 >= c ? !0 : (u || (v = b.snapshot.get()), clearTimeout(u), void(u = setTimeout(function() {
+			return ctrlKey(a) || c >= 37 && 40 >= c ? !0 : (u || (v = b.snapshot.get()), clearTimeout(u), void(u = setTimeout(function() {
 				u = null, b.undo.saveStep()
 			}, 500)))
 		}
 		function r(a) {
-			return o(a) ? !0 : void(v && u && (b.undo.saveStep(v), v = null))
+			return ctrlKey(a) ? !0 : void(v && u && (b.undo.saveStep(v), v = null))
 		}
-		function s() {
+		function forceUndo() {
 			u && (clearTimeout(u), b.undo.saveStep(), v = null)
 		}
-		function t() {
+		function init() {
 			if (b.events.on("keydown", q), b.events.on("input", h), b.events.on("keyup", r), b.events.on("keydown", k), b.events.on("keyup", n), b.events.on("cut", i), b.$el.get(0).msGetInputContext) try {
 				b.$el.get(0).msGetInputContext().addEventListener("MSCandidateWindowShow", function() {
 					w = !0
@@ -2251,10 +2268,10 @@ function(jq) {
 		var u, v, w = !1;
 		return {
 			require: ["core", "cursor", "events"],
-			_init: t,
-			ctrlKey: o,
-			isCharacter: p,
-			forceUndo: s
+			_init: init,
+			ctrlKey: ctrlKey,
+			isCharacter: isCharacter,
+			forceUndo: forceUndo
 		}
 	}
 }(jQuery), 
@@ -2265,17 +2282,17 @@ function(jq) {
 		language: null
 	}), 
 	jq.FroalaEditor.LANGUAGE = {}, jq.FroalaEditor.MODULES.language = function(b) {
-		function c(a) {
+		function translate(a) {
 			return e && e.translation[a] ? e.translation[a] : a
 		}
-		function d() {
+		function init() {
 			jq.FroalaEditor.LANGUAGE && (e = jq.FroalaEditor.LANGUAGE[b.opts.language]), e && e.direction && (b.opts.direction = e.direction)
 		}
 		var e;
 		return {
 			require: ["core"],
-			_init: d,
-			translate: c
+			_init: init,
+			translate: translate
 		}
 	}
 }(jQuery), 
@@ -2352,26 +2369,26 @@ function(jq) {
 		pasteDeniedTags: ["colgroup", "col"],
 		pasteDeniedAttrs: ["class", "id", "style"]
 	}), 
-	jq.FroalaEditor.MODULES.paste = function(b) {
+	jq.FroalaEditor.MODULES.paste = function(froalaEditor) {
 		function c(c) {
-			l = b.html.getSelected(), m = jq("<div>").html(l).text(), "cut" == c.type && (b.undo.saveStep(), setTimeout(function() {
-				b.undo.saveStep()
+			l = froalaEditor.html.getSelected(), m = jq("<div>").html(l).text(), "cut" == c.type && (froalaEditor.undo.saveStep(), setTimeout(function() {
+				froalaEditor.undo.saveStep()
 			}, 0))
 		}
 		function d(a) {
-			if (a.originalEvent && (a = a.originalEvent), b.events.trigger("paste.before", [a]) === !1) return !1;
-			if (n = b.$window.scrollTop(), a && a.clipboardData && a.clipboardData.getData) {
+			if (a.originalEvent && (a = a.originalEvent), froalaEditor.events.trigger("paste.before", [a]) === !1) return !1;
+			if (n = froalaEditor.$window.scrollTop(), a && a.clipboardData && a.clipboardData.getData) {
 				var c = "",
 					d = a.clipboardData.types;
-				if (b.helpers.isArray(d)) for (var f = 0; f < d.length; f++) c += d[f] + ";";
+				if (froalaEditor.helpers.isArray(d)) for (var f = 0; f < d.length; f++) c += d[f] + ";";
 				else c = d;
-				if (o = "", /text\/html/.test(c) ? o = a.clipboardData.getData("text/html") : /text\/rtf/.test(c) && b.browser.safari ? o = a.clipboardData.getData("text/rtf") : /text\/plain/.test(c) && !this.browser.mozilla && (o = b.html.escapeEntities(a.clipboardData.getData("text/plain")).replace(/\n/g, "<br>")), "" !== o) return h(), a.preventDefault && (a.stopPropagation(), a.preventDefault()), !1;
+				if (o = "", /text\/html/.test(c) ? o = a.clipboardData.getData("text/html") : /text\/rtf/.test(c) && froalaEditor.browser.safari ? o = a.clipboardData.getData("text/rtf") : /text\/plain/.test(c) && !this.browser.mozilla && (o = froalaEditor.html.escapeEntities(a.clipboardData.getData("text/plain")).replace(/\n/g, "<br>")), "" !== o) return h(), a.preventDefault && (a.stopPropagation(), a.preventDefault()), !1;
 				o = null
 			}
 			e()
 		}
 		function e() {
-			b.selection.save(), b.events.disableBlur(), o = null, p ? p.html("") : (p = jq('<div contenteditable="true" style="position: fixed; top: 0; left: -9999px; height: 100%; width: 0; z-index: 4000; line-height: 140%;" tabindex="-1"></div>'), b.$box.after(p)), p.focus(), b.window.setTimeout(h, 1)
+			froalaEditor.selection.save(), froalaEditor.events.disableBlur(), o = null, p ? p.html("") : (p = jq('<div contenteditable="true" style="position: fixed; top: 0; left: -9999px; height: 100%; width: 0; z-index: 4000; line-height: 140%;" tabindex="-1"></div>'), froalaEditor.$box.after(p)), p.focus(), froalaEditor.window.setTimeout(h, 1)
 		}
 		function f(c) {
 			c = c.replace(/<p(.*?)class="?'?MsoListParagraph"?'? ([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<ul><li>$3</li></ul>"), c = c.replace(/<p(.*?)class="?'?NumberedText"?'? ([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<ol><li>$3</li></ol>"), c = c.replace(/<p(.*?)class="?'?MsoListParagraphCxSpFirst"?'?([\s\S]*?)(level\d)?([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<ul><li$3>$5</li>"), c = c.replace(/<p(.*?)class="?'?NumberedTextCxSpFirst"?'?([\s\S]*?)(level\d)?([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<ol><li$3>$5</li>"), c = c.replace(/<p(.*?)class="?'?MsoListParagraphCxSpMiddle"?'?([\s\S]*?)(level\d)?([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<li$3>$5</li>"), c = c.replace(/<p(.*?)class="?'?NumberedTextCxSpMiddle"?'?([\s\S]*?)(level\d)?([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<li$3>$5</li>"), c = c.replace(/<p(.*?)class="?'?MsoListParagraphCxSpLast"?'?([\s\S]*?)(level\d)?([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<li$3>$5</li></ul>"), c = c.replace(/<p(.*?)class="?'?NumberedTextCxSpLast"?'?([\s\S]*?)(level\d)?([\s\S]*?)>([\s\S]*?)<\/p>/gi, "<li$3>$5</li></ol>"), c = c.replace(/<span([^<]*?)style="?'?mso-list:Ignore"?'?([\s\S]*?)>([\s\S]*?)<span/gi, "<span><span"), c = c.replace(/<!--\[if \!supportLists\]-->([\s\S]*?)<!--\[endif\]-->/gi, ""), c = c.replace(/<!\[if \!supportLists\]>([\s\S]*?)<!\[endif\]>/gi, ""), c = c.replace(/(\n|\r| class=(")?Mso[a-zA-Z0-9]+(")?)/gi, " "), c = c.replace(/<!--[\s\S]*?-->/gi, ""), c = c.replace(/<(\/)*(meta|link|span|\\?xml:|st1:|o:|font)(.*?)>/gi, "");
@@ -2383,7 +2400,7 @@ function(jq) {
 			var g;
 			do g = c, c = c.replace(/<[^\/>][^>]*><\/[^>]+>/gi, "");
 			while (c != g);
-			c = c.replace(/<lilevel([^1])([^>]*)>/gi, '<li data-indent="true"$2>'), c = c.replace(/<lilevel1([^>]*)>/gi, "<li$1>"), c = b.clean.html(c, b.opts.pasteDeniedTags, b.opts.pasteDeniedAttrs), c = c.replace(/<a>(.[^<]+)<\/a>/gi, "$1");
+			c = c.replace(/<lilevel([^1])([^>]*)>/gi, '<li data-indent="true"$2>'), c = c.replace(/<lilevel1([^>]*)>/gi, "<li$1>"), c = froalaEditor.clean.html(c, froalaEditor.opts.pasteDeniedTags, froalaEditor.opts.pasteDeniedAttrs), c = c.replace(/<a>(.[^<]+)<\/a>/gi, "$1");
 			var h = jq("<div>").html(c);
 			return h.find("li[data-indent]").each(function(b, c) {
 				var d = jq(c);
@@ -2396,32 +2413,32 @@ function(jq) {
 		function g(c) {
 			var d = jq("<div>").html(c);
 			d.find("p, div, h1, h2, h3, h4, h5, h6, pre, blockquote").each(function(c, d) {
-				jq(d).replaceWith("<" + (b.html.defaultTag() || "DIV") + ">" + jq(d).html() + "</" + (b.html.defaultTag() || "DIV") + ">")
+				jq(d).replaceWith("<" + (froalaEditor.html.defaultTag() || "DIV") + ">" + jq(d).html() + "</" + (froalaEditor.html.defaultTag() || "DIV") + ">")
 			}), jq(d.find("*").not("p, div, h1, h2, h3, h4, h5, h6, pre, blockquote, ul, ol, li, table, tbody, thead, tr, td, br").get().reverse()).each(function() {
 				jq(this).replaceWith(jq(this).html())
 			});
 			
 			var e = function(c) {
-				for (var d = b.node.contents(c), f = 0; f < d.length; f++) 3 != d[f].nodeType && 1 != d[f].nodeType ? jq(d[f]).remove() : e(d[f])
+				for (var d = froalaEditor.node.contents(c), f = 0; f < d.length; f++) 3 != d[f].nodeType && 1 != d[f].nodeType ? jq(d[f]).remove() : e(d[f])
 			};
 			
 			return e(d.get(0)), d.html()
 		}
 		function h() {
-			b.keys.forceUndo();
+			froalaEditor.keys.forceUndo();
 			
-			var c = b.snapshot.get();
+			var c = froalaEditor.snapshot.get();
 			
-			null === o && (o = p.html(), b.events.focus(), b.selection.restore(), b.events.enableBlur(), b.$window.scrollTop(n));
-			var d = b.events.chainTrigger("paste.beforeCleanup", o);
-			if ("string" == typeof d && (o = d), o.indexOf("<body") >= 0 && (o = o.replace(/[.\s\S\w\W<>]*<body[^>]*>([.\s\S\w\W<>]*)<\/body>[.\s\S\w\W<>]*/g, "$1")), o.match(/(class=\"?Mso|style=\"[^\"]*\bmso\-|w:WordDocument)/gi) ? (o = f(o), o = j(o), o = b.clean.html(o, b.opts.pasteDeniedTags, b.opts.pasteDeniedAttrs)) : (b.opts.htmlAllowComments = !1, o = b.clean.html(o, b.opts.pasteDeniedTags, b.opts.pasteDeniedAttrs), b.opts.htmlAllowComments = !0, o = j(o), o = o.replace(/\r|\n|\t/g, ""), m && jq("<div>").html(o).text().replace(/(\u00A0)/gi, " ").replace(/\r|\n/gi, "") == m.replace(/(\u00A0)/gi, " ").replace(/\r|\n/gi, "") && (o = l)), b.opts.pastePlain && (o = g(o)), d = b.events.chainTrigger("paste.afterCleanup", o), "string" == typeof d && (o = d), "" !== o) {
+			null === o && (o = p.html(), froalaEditor.events.focus(), froalaEditor.selection.restore(), froalaEditor.events.enableBlur(), froalaEditor.$window.scrollTop(n));
+			var d = froalaEditor.events.chainTrigger("paste.beforeCleanup", o);
+			if ("string" == typeof d && (o = d), o.indexOf("<body") >= 0 && (o = o.replace(/[.\s\S\w\W<>]*<body[^>]*>([.\s\S\w\W<>]*)<\/body>[.\s\S\w\W<>]*/g, "$1")), o.match(/(class=\"?Mso|style=\"[^\"]*\bmso\-|w:WordDocument)/gi) ? (o = f(o), o = j(o), o = froalaEditor.clean.html(o, froalaEditor.opts.pasteDeniedTags, froalaEditor.opts.pasteDeniedAttrs)) : (froalaEditor.opts.htmlAllowComments = !1, o = froalaEditor.clean.html(o, froalaEditor.opts.pasteDeniedTags, froalaEditor.opts.pasteDeniedAttrs), froalaEditor.opts.htmlAllowComments = !0, o = j(o), o = o.replace(/\r|\n|\t/g, ""), m && jq("<div>").html(o).text().replace(/(\u00A0)/gi, " ").replace(/\r|\n/gi, "") == m.replace(/(\u00A0)/gi, " ").replace(/\r|\n/gi, "") && (o = l)), froalaEditor.opts.pastePlain && (o = g(o)), d = froalaEditor.events.chainTrigger("paste.afterCleanup", o), "string" == typeof d && (o = d), "" !== o) {
 				var e = jq("<div>").html(o);
-				b.html.normalizeSpaces(e.get(0)), o = e.html(), b.html.insert(o, !0)
+				froalaEditor.html.normalizeSpaces(e.get(0)), o = e.html(), froalaEditor.html.insert(o, !0)
 			}
-			i(), b.undo.saveStep(c), b.undo.saveStep()
+			i(), froalaEditor.undo.saveStep(c), froalaEditor.undo.saveStep()
 		}
 		function i() {
-			b.events.trigger("paste.after")
+			froalaEditor.events.trigger("paste.after")
 		}
 		function j(b) {
 			for (var c, d = jq("<div>").html(b), e = d.find("*:empty:not(br, img, td, th)"); e.length;) {
@@ -2444,13 +2461,13 @@ function(jq) {
 			}
 			return d.html()
 		}
-		function k() {
-			b.events.on("copy", c), b.events.on("cut", c), b.events.on("paste", d)
+		function init() {
+			froalaEditor.events.on("copy", c), froalaEditor.events.on("cut", c), froalaEditor.events.on("paste", d)
 		}
 		var l, m, n, o, p;
 		return {
 			require: ["events", "core"],
-			_init: k
+			_init: init
 		}
 	}
 }(jQuery), 
@@ -2580,21 +2597,21 @@ function(jq) {
 				console.log(j)
 			}
 		}
-		function i(b) {
+		function restore(b) {
 			a.$el.html() != b.html && a.$el.html(b.html);
 			var c = a.selection.get();
 			
 			a.selection.clear(), a.events.focus(!0);
 			for (var d = 0; d < b.ranges.length; d++) h(c, b.ranges[d])
 		}
-		function j(a, b) {
+		function equal(a, b) {
 			return a.html != b.html ? !1 : JSON.stringify(a.ranges) != JSON.stringify(b.ranges) ? !1 : !0
 		}
 		return {
 			require: ["selection"],
 			get: f,
-			restore: i,
-			equal: j
+			restore: restore,
+			equal: equal
 		}
 	}
 }(jQuery), 
@@ -2619,7 +2636,7 @@ function(jq) {
 				j = "defaultView" in i ? i.defaultView : i.parentWindow;
 			e.offset().left + e.outerWidth() > jq(j).width() && e.css("margin-left", -(e.offset().left + e.outerWidth() - jq(j).width())), g.removeClass("fr-active")
 		}
-		function d(c) {
+		function exec(c) {
 			c.addClass("fr-blink"), setTimeout(function() {
 				c.removeClass("fr-blink")
 			}, 500);
@@ -2630,11 +2647,11 @@ function(jq) {
 		}
 		function e(b) {
 			var c = jq(b.currentTarget);
-			d(c)
+			exec(c)
 		}
 		function f(d) {
 			var f = jq(d.currentTarget);
-			0 != f.parents(".fr-popup").length || f.data("popup") || b.popups.hideAll(), f.hasClass("fr-dropdown") ? c(d) : (e(d), jq.FroalaEditor.COMMANDS[f.data("cmd")] && 0 != jq.FroalaEditor.COMMANDS[f.data("cmd")].refreshAfterCallback && o())
+			0 != f.parents(".fr-popup").length || f.data("popup") || b.popups.hideAll(), f.hasClass("fr-dropdown") ? c(d) : (e(d), jq.FroalaEditor.COMMANDS[f.data("cmd")] && 0 != jq.FroalaEditor.COMMANDS[f.data("cmd")].refreshAfterCallback && bulkRefresh())
 		}
 		function g(a) {
 			var b = a.find(".fr-dropdown.fr-active");
@@ -2646,7 +2663,7 @@ function(jq) {
 		function i(a) {
 			a.stopPropagation()
 		}
-		function j(c, d) {
+		function bindCommands(c, d) {
 			b.events.bindClick(c, ".fr-command:not(.fr-disabled)", f), c.on(b._mousedown + " " + b._mouseup + " " + b._move, ".fr-dropdown-menu", h), c.on(b._mousedown + " " + b._mouseup + " " + b._move, ".fr-dropdown-menu .fr-dropdown-wrapper", i);
 			var e = c.get(0).ownerDocument,
 				j = "defaultView" in e ? e.defaultView : e.parentWindow,
@@ -2682,7 +2699,7 @@ function(jq) {
 			}
 			return g
 		}
-		function m(b) {
+		function buildList(b) {
 			for (var c = "", d = 0; d < b.length; d++) {
 				var e = b[d],
 					f = jq.FroalaEditor.COMMANDS[e];
@@ -2690,31 +2707,31 @@ function(jq) {
 			}
 			return c
 		}
-		function n(c) {
+		function refresh(c) {
 			var d, e = c.data("cmd");
 			c.hasClass("fr-dropdown") ? d = c.next() : c.removeClass("fr-active"), jq.FroalaEditor.COMMANDS[e] && jq.FroalaEditor.COMMANDS[e].refresh ? jq.FroalaEditor.COMMANDS[e].refresh.apply(b, [c, d]) : b.refresh[e] ? b.refresh[e](c, d) : b.refresh["default"](c, e)
 		}
-		function o() {
+		function bulkRefresh() {
 			return 0 == b.events.trigger("buttons.refresh") ? !1 : void setTimeout(function() {
 				for (var c = b.selection.inEditor() && b.core.hasFocus(), d = 0; d < q.length; d++) {
 					var e = jq(q[d]),
 						f = e.data("cmd");
-					0 == e.parents(".fr-popup").length ? c || jq.FroalaEditor.COMMANDS[f] && jq.FroalaEditor.COMMANDS[f].forcedRefresh ? n(e) : e.hasClass("fr-dropdown") || e.removeClass("fr-active") : e.parents(".fr-popup").is(":visible") && n(e)
+					0 == e.parents(".fr-popup").length ? c || jq.FroalaEditor.COMMANDS[f] && jq.FroalaEditor.COMMANDS[f].forcedRefresh ? refresh(e) : e.hasClass("fr-dropdown") || e.removeClass("fr-active") : e.parents(".fr-popup").is(":visible") && refresh(e)
 				}
 			}, 0)
 		}
 		function p() {
-			b.events.on("mouseup", o), b.events.on("keyup", o), b.events.on("blur", o), b.events.on("focus", o), b.events.on("contentChanged", o)
+			b.events.on("mouseup", bulkRefresh), b.events.on("keyup", bulkRefresh), b.events.on("blur", bulkRefresh), b.events.on("focus", bulkRefresh), b.events.on("contentChanged", bulkRefresh)
 		}
 		var q = [];
 		return {
 			require: ["events", "icon", "language"],
 			_init: p,
-			buildList: m,
-			bindCommands: j,
-			refresh: n,
-			bulkRefresh: o,
-			exec: d
+			buildList: buildList,
+			bindCommands: bindCommands,
+			refresh: refresh,
+			bulkRefresh: bulkRefresh,
+			exec: exec
 		}
 	}
 }(jQuery), 
@@ -2786,7 +2803,7 @@ function(jq) {
 	}, jq.FroalaEditor.DefineIcon = function(b, c) {
 		jq.FroalaEditor.ICONS[b] = c
 	}, jq.FroalaEditor.MODULES.icon = function(b) {
-		function c(b) {
+		function create(b) {
 			var c = null,
 				d = jq.FroalaEditor.ICONS[b];
 			if ("undefined" != typeof d) {
@@ -2799,7 +2816,7 @@ function(jq) {
 		}
 		return {
 			require: ["events"],
-			create: c
+			create: create
 		}
 	}
 }(jQuery), 

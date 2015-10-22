@@ -1091,16 +1091,16 @@ function(jq) {
 function(jq) {
 	"use strict";
 	jq.FroalaEditor.MODULES.node = function(b) {
-		function c(b) {
+		function contents(b) {
 			return b && "IFRAME" != b.tagName ? jq(b).contents() : []
 		}
-		function d(b) {
-			return b ? b.nodeType != Node.ELEMENT_NODE ? !1 : jq.FroalaEditor.BLOCK_TAGS.indexOf(b.tagName.toLowerCase()) >= 0 : !1
+		function isBlock(input) {
+			return input ? input.nodeType != Node.ELEMENT_NODE ? !1 : jq.FroalaEditor.BLOCK_TAGS.indexOf(input.tagName.toLowerCase()) >= 0 : !1
 		}
-		function e(b, e) {
+		function isEmpty(b, e) {
 			if (jq(b).find("table").length > 0) return !1;
-			var f = c(b);
-			1 == f.length && d(f[0]) && (f = c(f[0]));
+			var f = contents(b);
+			1 == f.length && isBlock(f[0]) && (f = contents(f[0]));
 			for (var g = !1, h = 0; h < f.length; h++) {
 				var i = f[h];
 				if (!e || !jq(i).hasClass("fr-marker")) {
@@ -1110,74 +1110,74 @@ function(jq) {
 			}
 			return !0
 		}
-		function f(c) {
-			for (; c && c.parentNode !== b.$el.get(0) && (!c.parentNode || !jq(c.parentNode).hasClass("fr-inner"));) if (c = c.parentNode, d(c)) return c;
+		function blockParent(c) {
+			for (; c && c.parentNode !== b.$el.get(0) && (!c.parentNode || !jq(c.parentNode).hasClass("fr-inner"));) if (c = c.parentNode, isBlock(c)) return c;
 			return null
 		}
-		function g(c, e, f) {
+		function deepestParent(c, e, f) {
 			if ("undefined" == typeof e && (e = []), "undefined" == typeof f && (f = !0), e.push(b.$el.get(0)), e.indexOf(c.parentNode) >= 0 || c.parentNode && jq(c.parentNode).hasClass("fr-inner") || c.parentNode && jq.FroalaEditor.SIMPLE_ENTER_TAGS.indexOf(c.parentNode.tagName) >= 0 && f) return null;
-			for (; e.indexOf(c.parentNode) < 0 && c.parentNode && !jq(c.parentNode).hasClass("fr-inner") && (jq.FroalaEditor.SIMPLE_ENTER_TAGS.indexOf(c.parentNode.tagName) < 0 || !f) && (!d(c) || !d(c.parentNode) || !f);) c = c.parentNode;
+			for (; e.indexOf(c.parentNode) < 0 && c.parentNode && !jq(c.parentNode).hasClass("fr-inner") && (jq.FroalaEditor.SIMPLE_ENTER_TAGS.indexOf(c.parentNode.tagName) < 0 || !f) && (!isBlock(c) || !isBlock(c.parentNode) || !f);) c = c.parentNode;
 			return c
 		}
-		function h(a) {
+		function rawAttributes(a) {
 			for (var b = {}, c = a.attributes, d = 0; d < c.length; d++) {
 				var e = c[d];
 				b[e.nodeName] = e.value
 			}
 			return b
 		}
-		function i(a) {
+		function attributes(a) {
 			for (var b = "", c = a.attributes, d = 0; d < c.length; d++) {
 				var e = c[d];
 				b += " " + e.nodeName + '="' + e.value + '"'
 			}
 			return b
 		}
-		function j(a) {
+		function clearAttributes(a) {
 			for (var b = a.attributes, c = 0; c < b.length; c++) {
 				var d = b[c];
 				a.removeAttribute(d.nodeName)
 			}
 		}
-		function k(a) {
-			return "<" + a.tagName.toLowerCase() + i(a) + ">"
+		function openTagString(a) {
+			return "<" + a.tagName.toLowerCase() + attributes(a) + ">"
 		}
-		function l(a) {
+		function closeTagString(a) {
 			return "</" + a.tagName.toLowerCase() + ">"
 		}
-		function m(b, c) {
+		function isFirstSibling(b, c) {
 			"undefined" == typeof c && (c = !0);
 			for (var d = b.previousSibling; d && c && jq(d).hasClass("fr-marker");) d = d.previousSibling;
-			return d ? d.nodeType == Node.TEXT_NODE && "" === d.textContent ? m(d) : !1 : !0
+			return d ? d.nodeType == Node.TEXT_NODE && "" === d.textContent ? isFirstSibling(d) : !1 : !0
 		}
-		function n(b) {
+		function isVoid(b) {
 			return b && jq.FroalaEditor.VOID_ELEMENTS.indexOf((b.tagName || "").toLowerCase()) >= 0
 		}
-		function o(a) {
+		function isList(a) {
 			return a ? ["UL", "OL"].indexOf(a.tagName) >= 0 : !1
 		}
-		function p(a) {
+		function isElement(a) {
 			return a === b.$el.get(0)
 		}
-		function q(a) {
+		function hasFocus(a) {
 			return a == b.document.activeElement
 		}
 		return {
-			isBlock: d,
-			isEmpty: e,
-			blockParent: f,
-			deepestParent: g,
-			rawAttributes: h,
-			attributes: i,
-			clearAttributes: j,
-			openTagString: k,
-			closeTagString: l,
-			isFirstSibling: m,
-			isList: o,
-			isElement: p,
-			contents: c,
-			isVoid: n,
-			hasFocus: q
+			isBlock: isBlock,
+			isEmpty: isEmpty,
+			blockParent: blockParent,
+			deepestParent: deepestParent,
+			rawAttributes: rawAttributes,
+			attributes: attributes,
+			clearAttributes: clearAttributes,
+			openTagString: openTagString,
+			closeTagString: closeTagString,
+			isFirstSibling: isFirstSibling,
+			isList: isList,
+			isElement: isElement,
+			contents: contents,
+			isVoid: isVoid,
+			hasFocus: hasFocus
 		}
 	}
 }(jQuery), 

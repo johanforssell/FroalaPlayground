@@ -34,12 +34,15 @@
   <script>
 $(function() {
   
-  // Add our own tags
+  // Extend the list of block tags the Froala editor keeps track of
   $.FroalaEditor.BLOCK_TAGS.push("cc-factbox-intro", "cc-factbox");
   
+  // Define custom icons for custom buttons
   $.FroalaEditor.DefineIcon('cc-factbox-intro', {NAME: 'header'});
   $.FroalaEditor.DefineIcon('cc-factbox', {NAME: 'list-alt'});
   
+  
+  // Create command: Toggle block 'factbox intro'
   $.FroalaEditor.RegisterCommand('cc-factbox-intro', {
     title: 'Fact box intro',
     focus: false,
@@ -56,6 +59,8 @@ $(function() {
     }
   });
   
+  
+  // Create command: Toggle block 'factbox'
   $.FroalaEditor.RegisterCommand('cc-factbox', {
     title: 'Fact box body',
     focus: false,
@@ -79,6 +84,7 @@ $(function() {
   });
   
   
+  // Set up the editor
   $('#froala-edit').froalaEditor({
     heightMin: 200,
     toolbarButtons: [  
@@ -104,8 +110,6 @@ $(function() {
     ],
     imageAllowedTypes: []
   });
-  
-    console.log($('#froala-edit').BLOCK_TAGS);
     
 });
   </script>
